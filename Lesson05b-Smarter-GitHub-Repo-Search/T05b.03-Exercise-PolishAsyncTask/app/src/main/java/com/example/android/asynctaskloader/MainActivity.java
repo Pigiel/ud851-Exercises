@@ -166,6 +166,8 @@ public class MainActivity extends AppCompatActivity implements
         return new AsyncTaskLoader<String>(this) {
 
             // TODO (1) Create a String member variable called mGithubJson that will store the raw JSON
+            /* This String will contain the raw JSON from the results of our Github search */
+            String mGithubJson;
 
             @Override
             protected void onStartLoading() {
@@ -175,15 +177,22 @@ public class MainActivity extends AppCompatActivity implements
                     return;
                 }
 
-                // TODO (2) If mGithubJson is not null, deliver that result. Otherwise, force a load
-
                 /*
                  * When we initially begin loading in the background, we want to display the
                  * loading indicator to the user
                  */
                 mLoadingIndicator.setVisibility(View.VISIBLE);
 
-                forceLoad();
+                // TODO (2) If mGithubJson is not null, deliver that result. Otherwise, force a load
+                /*
+                 * If we already have cached results, just deliver them now. If we don't have any
+                 * cached results, force a load.
+                 */
+                if (mGithubJson != null) {
+                    deliverResult(mGithubJson);
+                } else {
+                    forceLoad();
+                }
             }
 
             @Override
@@ -193,7 +202,7 @@ public class MainActivity extends AppCompatActivity implements
                 String searchQueryUrlString = args.getString(SEARCH_QUERY_URL_EXTRA);
 
                 /* If the user didn't enter anything, there's nothing to search for */
-                if (TextUtils.isEmpty(searchQueryUrlString)) {
+                if (searchQueryUrlString == null || TextUtils.isEmpty(searchQueryUrlString)) {
                     return null;
                 }
 
@@ -210,6 +219,12 @@ public class MainActivity extends AppCompatActivity implements
 
             // TODO (3) Override deliverResult and store the data in mGithubJson
             // TODO (4) Call super.deliverResult after storing the data
+
+            @Override
+            public void deliverResult(String githubJson) {
+                mGithubJson = githubJson;
+                super.deliverResult(githubJson);
+            }
         };
     }
 

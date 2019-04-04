@@ -18,6 +18,7 @@ package com.example.android.implicitintents;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.ShareCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
@@ -53,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         Uri.Builder builder = new Uri.Builder();
         builder.scheme("geo")
                 .path("0,0")
-                .appendQueryParameter("q", addressString);
+                .query(addressString);
         Uri addressUri = builder.build();
 
         showMap(addressUri);
@@ -67,9 +68,14 @@ public class MainActivity extends AppCompatActivity {
      */
     public void onClickShareTextButton(View v) {
         // TODO (5) Specify a String you'd like to share
+        /* Create the String that you want to share */
+        String textThatYouWantToShare =
+                "Sharing the coolest thing I've learned so far. You should " +
+                        "check out Udacity and Google's Android Nanodegree!";
 
         // TODO (6) Replace the Toast with shareText, passing in the String from step 5
-        Toast.makeText(this, "TODO: Share text when this is clicked", Toast.LENGTH_LONG).show();
+        /* Send that text to our method that will share it. */
+        shareText(textThatYouWantToShare);
     }
 
     /**
@@ -144,11 +150,42 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // TODO (1) Create a void method called shareText that accepts a String as a parameter
-    // Do steps 2 - 4 within the shareText method
+    /**
+     * This method shares text and allows the user to select which app they would like to use to
+     * share the text. Using ShareCompat's IntentBuilder, we get some really cool functionality for
+     * free. The chooser that is started using the {@link IntentBuilder#startChooser()} method will
+     * create a chooser when more than one app on the device can handle the Intent. This happens
+     * when the user has, for example, both a texting app and an email app. If only one Activity
+     * on the phone can handle the Intent, it will automatically be launched.
+     *
+     * @param textToShare Text that will be shared
+     */
+    private void shareText(String textToShare) {
+        // Do steps 2 - 4 within the shareText method
 
         // TODO (2) Create a String variable called mimeType and set it to "text/plain"
+        /*
+         * You can think of MIME types similarly to file extensions. They aren't the exact same,
+         * but MIME types help a computer determine which applications can open which content. For
+         * example, if you double click on a .pdf file, you will be presented with a list of
+         * programs that can open PDFs. Specifying the MIME type as text/plain has a similar affect
+         * on our implicit Intent. With text/plain specified, all apps that can handle text content
+         * in some way will be offered when we call startActivity on this particular Intent.
+         */
+        String mimeType = "text/plain";
 
         // TODO (3) Create a title for the chooser window that will pop up
+        /* This is just the title of the window that will pop up when we call startActivity */
+        String title = "Learning How to Share";
 
         // TODO (4) Use ShareCompat.IntentBuilder to build the Intent and start the chooser
+        /* ShareCompat.IntentBuilder provides a fluent API for creating Intents */
+        ShareCompat.IntentBuilder
+                /* The from method specifies the Context from which this share is coming from */
+                .from(this)
+                .setType(mimeType)
+                .setChooserTitle(title)
+                .setText(textToShare)
+                .startChooser();
+    }
 }
